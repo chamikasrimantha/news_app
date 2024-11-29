@@ -34,7 +34,7 @@ class _SourcesScreenState extends State<SourcesScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Sources'),
+        title: const Text('Sources', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),),
         backgroundColor: Colors.blueAccent,
       ),
       body: Consumer<ArticleController>(

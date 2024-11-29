@@ -11,7 +11,7 @@ class HeadlinesScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Top Headlines'),
+        title: const Text('Top Headlines', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),),
         backgroundColor: Colors.blueAccent,
       ),
       body: Consumer<ArticleController>(
