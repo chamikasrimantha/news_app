@@ -30,8 +30,8 @@ class CategoryController extends ChangeNotifier {
   Future<void> saveCategory(CategoryModel category) async {
     try {
       _setLoading(true);
-      _categoryService.saveCategory(category);
-      _categories = _categoryService.getAllCategories(); // Update categories list
+      await _categoryService.saveCategory(category); // Ensure it's awaited
+      _categories = await _categoryService.getAllCategories(); // Update categories list asynchronously
       _errorMessage = null;
     } catch (e) {
       _errorMessage = e.toString();
@@ -45,7 +45,7 @@ class CategoryController extends ChangeNotifier {
   Future<void> getAllCategories() async {
     try {
       _setLoading(true);
-      _categories = _categoryService.getAllCategories();
+      _categories = await _categoryService.getAllCategories(); // Ensure it's awaited
       _errorMessage = null;
     } catch (e) {
       _errorMessage = e.toString();
@@ -59,8 +59,8 @@ class CategoryController extends ChangeNotifier {
   Future<void> deleteCategory(String name) async {
     try {
       _setLoading(true);
-      _categoryService.deleteCategory(name);
-      _categories = _categoryService.getAllCategories(); // Update categories list after deletion
+      await _categoryService.deleteCategory(name); // Ensure it's awaited
+      _categories = await _categoryService.getAllCategories(); // Update categories list asynchronously
       _errorMessage = null;
     } catch (e) {
       _errorMessage = e.toString();
