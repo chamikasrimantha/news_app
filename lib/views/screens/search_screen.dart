@@ -28,7 +28,7 @@ class _SearchScreenState extends State<SearchScreen> {
     return Scaffold(
       appBar: AppBar(
         title: const Text("Search Articles", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),),
-        backgroundColor: Colors.blueAccent, // AppBar with blue accent
+        backgroundColor: Colors.black54, // AppBar with blue accent
       ),
       body: Consumer<ArticleController>(
         builder: (context, controller, child) {

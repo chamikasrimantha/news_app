@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:news_app/views/widgets/bottom_app_bar.dart'; // Assuming you have this widget
-import 'package:news_app/views/widgets/article_card.dart'; // Assuming this widget is used for displaying articles
 import 'package:provider/provider.dart';
+import '../../controllers/category_controller.dart';
 import '../../controllers/article_controller.dart';
+import '../../models/category_model.dart';
+import 'package:news_app/views/widgets/bottom_app_bar.dart';
+import 'package:news_app/views/widgets/article_card.dart';
 
 class CategoryScreen extends StatefulWidget {
   @override
@@ -10,63 +12,114 @@ class CategoryScreen extends StatefulWidget {
 }
 
 class _CategoryScreenState extends State<CategoryScreen> {
-  // Dummy list of categories
-  final List<String> categories = ['Technology', 'Sports', 'Business', 'Health', 'Entertainment'];
-  String selectedCategory = 'Technology'; // Default selected category
+  String? selectedCategory; // Initially null for no category selected
+  final TextEditingController _categoryController = TextEditingController();
 
-  // Fetch articles based on the selected category
+  @override
+  void initState() {
+    super.initState();
+    // Fetch all categories when the screen loads
+    Provider.of<CategoryController>(context, listen: false).getAllCategories();
+  }
+
   void _fetchArticlesByCategory() {
-    final controller = Provider.of<ArticleController>(context, listen: false);
-    controller.fetchArticlesByCategory(selectedCategory); // This would be a method to filter articles by category
+    if (selectedCategory != null) {
+      final articleController = Provider.of<ArticleController>(context, listen: false);
+      articleController.fetchArticlesByCategory(selectedCategory!); // Fetch articles for the selected category
+    }
+  }
+
+  void _saveCategory() {
+    final categoryName = _categoryController.text.trim();
+    if (categoryName.isNotEmpty) {
+      final categoryController = Provider.of<CategoryController>(context, listen: false);
+      final newCategory = CategoryModel(id: DateTime.now().millisecondsSinceEpoch, name: categoryName);
+      categoryController.saveCategory(newCategory);
+      _categoryController.clear();
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Categories", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),),
-        backgroundColor: Colors.blueAccent,
+        title: const Text(
+          "Categories",
+          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+        ),
+        backgroundColor: Colors.black54,
       ),
       body: Column(
         children: [
-          // Category selection dropdown or list
-          DropdownButton<String>(
-            value: selectedCategory,
-            onChanged: (String? newCategory) {
-              if (newCategory != null) {
-                setState(() {
-                  selectedCategory = newCategory;
-                });
-                _fetchArticlesByCategory(); // Fetch articles when a new category is selected
-              }
-            },
-            items: categories.map((category) {
-              return DropdownMenuItem<String>(
-                value: category,
-                child: Text(category),
-              );
-            }).toList(),
+          Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Column(
+              children: [
+                TextField(
+                  controller: _categoryController,
+                  decoration: InputDecoration(
+                    labelText: "Add New Category",
+                    border: OutlineInputBorder(),
+                    suffixIcon: IconButton(
+                      icon: const Icon(Icons.add, color: Colors.blueAccent),
+                      onPressed: _saveCategory,
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 16),
+                Consumer<CategoryController>(
+                  builder: (context, categoryController, child) {
+                    if (categoryController.isLoading) {
+                      return const Center(child: CircularProgressIndicator());
+                    } else if (categoryController.errorMessage != null) {
+                      return Center(child: Text(categoryController.errorMessage!));
+                    } else {
+                      final categories = categoryController.categories;
+                      return DropdownButton<String>(
+                        value: selectedCategory,
+                        hint: const Text("Select a Category"),
+                        isExpanded: true,
+                        items: categories.map((category) {
+                          return DropdownMenuItem<String>(
+                            value: category.name,
+                            child: Text(category.name),
+                          );
+                        }).toList(),
+                        onChanged: (String? newCategory) {
+                          setState(() {
+                            selectedCategory = newCategory;
+                          });
+                          _fetchArticlesByCategory();
+                        },
+                      );
+                    }
+                  },
+                ),
+              ],
+            ),
           ),
-          // Display articles based on the selected category
-          Consumer<ArticleController>(
-            builder: (context, controller, child) {
-              if (controller.isLoading) {
-                return Center(child: CircularProgressIndicator());
-              } else if (controller.errorMessage != null) {
-                return Center(child: Text(controller.errorMessage!));
-              } else {
-                final filteredArticles = controller.articles; // Assuming articles are filtered by category
-                return Expanded(
-                  child: ListView.builder(
+          Expanded(
+            child: Consumer<ArticleController>(
+              builder: (context, articleController, child) {
+                if (articleController.isLoading) {
+                  return const Center(child: CircularProgressIndicator());
+                } else if (articleController.errorMessage != null) {
+                  return Center(child: Text(articleController.errorMessage!));
+                } else {
+                  final filteredArticles = articleController.articles;
+                  if (filteredArticles.isEmpty) {
+                    return const Center(child: Text("No articles found for this category."));
+                  }
+                  return ListView.builder(
                     itemCount: filteredArticles.length,
                     itemBuilder: (context, index) {
                       final article = filteredArticles[index];
-                      return ArticleCard(article: article); // Display each article card
+                      return ArticleCard(article: article);
                     },
-                  ),
-                );
-              }
-            },
+                  );
+                }
+              },
+            ),
           ),
         ],
       ),

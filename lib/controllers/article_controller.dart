@@ -87,18 +87,20 @@ class ArticleController extends ChangeNotifier {
     notifyListeners();
   }
 
-  // Fetch articles by source
-  Future<void> fetchArticlesBySource(String sourceId) async {
+  Future<List<ArticleModel>> fetchArticlesBySource(String sourceId) async {
     try {
       _setLoading(true);
-      _articles = await _apiService.fetchArticlesBySource(sourceId);
+      final articles = await _apiService.fetchArticlesBySource(sourceId);
       _errorMessage = null;
+
+      // Ensure it always returns a list, even if it's empty
+      return articles ?? [];
     } catch (e) {
       _errorMessage = e.toString();
+      return []; // Return an empty list in case of an error
     } finally {
       _setLoading(false);
     }
-    notifyListeners();
   }
 
   // Sort articles by date (publishedAt)

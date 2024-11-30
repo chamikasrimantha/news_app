@@ -48,7 +48,7 @@ class _HomeScreenState extends State<HomeScreen> {
     return Scaffold(
       appBar: AppBar(
         title: const Text("Home", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),),
-        backgroundColor: Colors.blueAccent, // Modern app bar color
+        backgroundColor: Colors.black54, // Modern app bar color
         actions: [
           // Sort options: Newest, Oldest, and Custom Date
           PopupMenuButton<String>(

@@ -21,7 +21,7 @@ class CustomBottomAppBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BottomAppBar(
-      color: Colors.blueAccent, // App bar background color
+      color: Colors.black54, // App bar background color
       shape: CircularNotchedRectangle(), // To give the floating action button space
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 20.0),
@@ -31,7 +31,7 @@ class CustomBottomAppBar extends StatelessWidget {
             _buildIconButton(context, Icons.home, "Home", 0, HomeScreen()),
             _buildIconButton(context, Icons.search, "Search", 1, SearchScreen()),
             _buildIconButton(context, Icons.category, "Categories", 2, CategoryScreen()),
-            _buildIconButton(context, Icons.view_headline_rounded, "Headlines", 3, HeadlinesScreen()),
+            _buildIconButton(context, Icons.view_headline_outlined, "Headlines", 3, HeadlinesScreen()),
             _buildIconButton(context, Icons.bookmark, "Bookmarks", 4, BookmarkScreen()),
             _buildIconButton(context, Icons.source, "Sources", 5, SourcesScreen()),
           ],
