@@ -18,48 +18,45 @@ class BookmarkController extends ChangeNotifier {
   // Getter for error message
   String? get errorMessage => _errorMessage;
 
-  // Save bookmark
+  // Save a bookmark and refresh the list
   Future<void> saveBookmark(ArticleModel article) async {
     try {
       _setLoading(true);
-      _bookmarkService.saveBookmark(article);
-      _bookmarks = _bookmarkService.getAllBookmarks(); // Update the list of bookmarks
+      await _bookmarkService.saveBookmark(article); // Ensure async operation is awaited
+      await fetchAllBookmarks(); // Refresh bookmarks list
       _errorMessage = null;
     } catch (e) {
       _errorMessage = e.toString();
     } finally {
       _setLoading(false);
     }
-    notifyListeners();
   }
 
-  // Get all bookmarks
-  Future<void> getAllBookmarks() async {
+  // Fetch all bookmarks
+  Future<void> fetchAllBookmarks() async {
     try {
       _setLoading(true);
-      _bookmarks = _bookmarkService.getAllBookmarks();
+      _bookmarks = await _bookmarkService.getAllBookmarks(); // Fetch data from the database
       _errorMessage = null;
     } catch (e) {
       _errorMessage = e.toString();
     } finally {
       _setLoading(false);
     }
-    notifyListeners();
   }
 
-  // Delete a bookmark
+  // Delete a bookmark and refresh the list
   Future<void> deleteBookmark(String url) async {
     try {
       _setLoading(true);
-      _bookmarkService.deleteBookmark(url);
-      _bookmarks = _bookmarkService.getAllBookmarks(); // Update the list of bookmarks after deletion
+      await _bookmarkService.deleteBookmark(url); // Ensure async operation is awaited
+      await fetchAllBookmarks(); // Refresh bookmarks list
       _errorMessage = null;
     } catch (e) {
       _errorMessage = e.toString();
     } finally {
       _setLoading(false);
     }
-    notifyListeners();
   }
 
   // Helper method to set loading state

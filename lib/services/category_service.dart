@@ -17,34 +17,63 @@ class CategoryService {
     }
   }
 
-  // Initialize the SQLite database
   Future<Database> _initDatabase() async {
     final databasePath = await getDatabasesPath();
     final path = join(databasePath, 'app_database.db');
+
     return openDatabase(
       path,
-      version: 1,
+      version: 2, // Increment the version to trigger onUpgrade
       onCreate: (db, version) async {
-        await db.execute('''
-          CREATE TABLE categories(
-            id INTEGER PRIMARY KEY,
-            name TEXT
+        await _createTables(db);
+      },
+      onUpgrade: (db, oldVersion, newVersion) async {
+        if (oldVersion < 2) {
+          // Add bookmarks table
+          await db.execute('''
+          CREATE TABLE bookmarks(
+            url TEXT PRIMARY KEY,
+            title TEXT,
+            author TEXT,
+            description TEXT,
+            imageUrl TEXT,
+            publishedAt TEXT,
+            content TEXT
           )
         ''');
+        }
       },
     );
   }
 
+  Future<void> _createTables(Database db) async {
+    await db.execute('''
+    CREATE TABLE categories(
+      id INTEGER PRIMARY KEY,
+      name TEXT
+    )
+  ''');
+
+    await db.execute('''
+    CREATE TABLE bookmarks(
+      url TEXT PRIMARY KEY,
+      title TEXT,
+      author TEXT,
+      description TEXT,
+      imageUrl TEXT,
+      publishedAt TEXT,
+      content TEXT
+    )
+  ''');
+  }
+
   // Save a category (both in-memory and in the database)
   Future<void> saveCategory(CategoryModel category) async {
-    // In-memory check if the category already exists
     final isAlreadyExists = _categories.any((existingCategory) => existingCategory.name == category.name);
 
     if (!isAlreadyExists) {
-      // Add to in-memory list
       _categories.add(category);
 
-      // Save to database
       final db = await database;
       await db.insert('categories', category.toJson());
 
@@ -60,7 +89,6 @@ class CategoryService {
 
     final List<Map<String, dynamic>> categoryMaps = await db.query('categories');
 
-    // Map each category map to a CategoryModel instance
     return List.generate(categoryMaps.length, (i) {
       return CategoryModel.fromJson(categoryMaps[i]);
     });
@@ -68,7 +96,6 @@ class CategoryService {
 
   // Delete a category by name (from both in-memory and database)
   Future<void> deleteCategory(String name) async {
-    // Remove from in-memory list
     final categoryToRemove = _categories.firstWhere(
           (category) => category.name == name,
       orElse: () => throw Exception("Category not found: $name"),
@@ -77,7 +104,6 @@ class CategoryService {
     _categories.remove(categoryToRemove);
     print("Category removed from memory: ${categoryToRemove.name}");
 
-    // Remove from database
     final db = await database;
     await db.delete(
       'categories',
