@@ -9,7 +9,7 @@ class BookmarkScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Bookmarked Articles', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),),
+        title: const Text('Bookmarked News', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),),
         backgroundColor: Colors.black54, // Customize the app bar color
       ),
       body: Consumer<BookmarkController>(
