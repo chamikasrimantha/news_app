@@ -18,6 +18,11 @@ class BookmarkController extends ChangeNotifier {
   // Getter for error message
   String? get errorMessage => _errorMessage;
 
+  // Constructor
+  BookmarkController() {
+    fetchAllBookmarks(); // Fetch bookmarks when the controller is initialized
+  }
+
   // Save a bookmark and refresh the list
   Future<void> saveBookmark(ArticleModel article) async {
     try {

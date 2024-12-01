@@ -82,9 +82,14 @@ class ArticleCard extends StatelessWidget {
               // Bookmark Icon
               Consumer<BookmarkController>(
                 builder: (context, bookmarkController, child) {
+                  if (bookmarkController.isLoading) {
+                    return CircularProgressIndicator(); // Loading indicator
+                  }
+
                   final isBookmarked = bookmarkController.bookmarks.any(
                         (bookmark) => bookmark.article.url == article.url,
                   );
+
                   return IconButton(
                     icon: Icon(
                       isBookmarked ? Icons.bookmark : Icons.bookmark_border,

@@ -17,20 +17,25 @@ class CategoryService {
     }
   }
 
+  // Initialize the SQLite database
   Future<Database> _initDatabase() async {
     final databasePath = await getDatabasesPath();
     final path = join(databasePath, 'app_database.db');
 
     return openDatabase(
       path,
-      version: 2, // Increment the version to trigger onUpgrade
+      version: 1,
       onCreate: (db, version) async {
-        await _createTables(db);
-      },
-      onUpgrade: (db, oldVersion, newVersion) async {
-        if (oldVersion < 2) {
-          // Add bookmarks table
-          await db.execute('''
+        // Create categories table
+        await db.execute('''
+          CREATE TABLE categories(
+            id INTEGER PRIMARY KEY,
+            name TEXT
+          )
+        ''');
+
+        // Create bookmarks table
+        await db.execute('''
           CREATE TABLE bookmarks(
             url TEXT PRIMARY KEY,
             title TEXT,
@@ -41,30 +46,8 @@ class CategoryService {
             content TEXT
           )
         ''');
-        }
       },
     );
-  }
-
-  Future<void> _createTables(Database db) async {
-    await db.execute('''
-    CREATE TABLE categories(
-      id INTEGER PRIMARY KEY,
-      name TEXT
-    )
-  ''');
-
-    await db.execute('''
-    CREATE TABLE bookmarks(
-      url TEXT PRIMARY KEY,
-      title TEXT,
-      author TEXT,
-      description TEXT,
-      imageUrl TEXT,
-      publishedAt TEXT,
-      content TEXT
-    )
-  ''');
   }
 
   // Save a category (both in-memory and in the database)
